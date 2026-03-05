@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Интерактивное меню кафе</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Меню нашего кафе</h1>
+        <!-- Контейнер для кнопок фильтрации -->
+        <div class="filters" id="filter-buttons">
+            <button class="filter-btn active" data-category="all">Все</button>
+            <button class="filter-btn" data-category="пицца">Пицца</button>
+            <button class="filter-btn" data-category="роллы">Роллы</button>
+            <button class="filter-btn" data-category="суши">Суши</button>
+        </div>
+    </header>
+
+    <main>
+        <!-- Сюда JavaScript будет вставлять карточки блюд -->
+        <div class="menu-grid" id="menu-container">
+            <!-- Пример того, как будет выглядеть карточка:
+            <div class="menu-item">
+                <img src="url" alt="название">
+                <div class="item-info">
+                    <h3>Название</h3>
+                    <p>Описание...</p>
+                    <span class="price">500 ₽</span>
+                </div>
+            </div> 
+            -->
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
