@@ -16,23 +16,33 @@
             <button class="filter-btn" data-category="роллы">Роллы</button>
             <button class="filter-btn" data-category="суши">Суши</button>
         </div>
+        
+        <!-- Кнопка корзины в шапке -->
+        <div class="cart-status" id="cart-toggle">
+            🛒 Корзина: <span id="cart-count">0</span> товаров
+        </div>
     </header>
 
     <main>
         <!-- Сюда JavaScript будет вставлять карточки блюд -->
-        <div class="menu-grid" id="menu-container">
-            <!-- Пример того, как будет выглядеть карточка:
-            <div class="menu-item">
-                <img src="url" alt="название">
-                <div class="item-info">
-                    <h3>Название</h3>
-                    <p>Описание...</p>
-                    <span class="price">500 ₽</span>
-                </div>
-            </div> 
-            -->
-        </div>
+        <div class="menu-grid" id="menu-container"></div>
     </main>
+
+    <!-- Окно корзины (скрыто по умолчанию) -->
+    <div class="cart-modal" id="cart-modal">
+        <div class="cart-content">
+            <span class="close-cart" id="close-cart">&times;</span>
+            <h2>Ваш заказ</h2>
+            <div id="cart-items-list">
+                <!-- Сюда JS добавит товары из корзины -->
+            </div>
+            <hr>
+            <div class="cart-total">
+                Итого: <span id="cart-total-price">0 ₽</span>
+            </div>
+            <button class="order-btn" id="checkout-btn">Оформить заказ</button>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>
