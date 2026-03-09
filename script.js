@@ -1,6 +1,6 @@
 /* 
    =========================================
-   БАЗА ДАННЫХ (Список блюд)
+   1. ДАННЫЕ (База блюд)
    =========================================
 */
 const menuItems = [
@@ -8,7 +8,7 @@ const menuItems = [
         id: 1,
         title: "Пицца Пепперони",
         category: "пицца",
-        price: 590, // Теперь храним как число для расчетов
+        price: 590,
         calories: "280 ккал/100г",
         img: "https://images.unsplash.com/photo-1628840042765-356cda07504e?q=80&w=800&auto=format&fit=crop",
         desc: "Классическая пицца с острыми колбасками пепперони и сыром моцарелла."
@@ -60,20 +60,30 @@ const menuItems = [
     }
 ];
 
-// Переменная для хранения товаров в корзине
+/* 
+   =========================================
+   2. ПЕРЕМЕННЫЕ И ЭЛЕМЕНТЫ
+   =========================================
+*/
+// Состояние корзины
 let cart = [];
 
-// Находим элементы управления
-const menuContainer = document.getElementById('menu-container');
-const filterButtons = document.querySelectorAll('.filter-btn');
-const cartModal = document.getElementById('cart-modal');
-const cartItemsList = document.getElementById('cart-items-list');
-const cartCount = document.getElementById('cart-count');
-const cartTotal = document.getElementById('cart-total-price');
+// Все нужные элементы со страницы в одном месте
+const elements = {
+    menuContainer: document.getElementById('menu-container'),
+    filterButtons: document.querySelectorAll('.filter-btn'),
+    cartModal: document.getElementById('cart-modal'),
+    cartItemsList: document.getElementById('cart-items-list'),
+    cartCount: document.getElementById('cart-count'),
+    cartTotal: document.getElementById('cart-total-price'),
+    cartToggle: document.getElementById('cart-toggle'),
+    closeCart: document.getElementById('close-cart'),
+    checkoutBtn: document.getElementById('checkout-btn')
+};
 
 /* 
    =========================================
-   ОТРИСОВКА МЕНЮ
+   3. ЛОГИКА ОТОБРАЖЕНИЯ МЕНЮ
    =========================================
 */
 function renderMenu(itemsToRender) {
@@ -90,43 +100,36 @@ function renderMenu(itemsToRender) {
                     <h3>${item.title}</h3>
                     <p>${item.desc}</p>
                     <span class="price">${item.price} ₽</span>
-                    <!-- Кнопка добавления. Передаем ID блюда в функцию -->
                     <button class="add-to-cart-btn" onclick="addToCart(${item.id})">
                         Добавить в корзину
                     </button>
                 </div>
             </div>`;
     }
-    menuContainer.innerHTML = htmlContent;
+    elements.menuContainer.innerHTML = htmlContent;
 }
 
 /* 
    =========================================
-   ЛОГИКА КОРЗИНЫ
+   4. ЛОГИКА КОРЗИНЫ (Добавление / Удаление)
    =========================================
 */
-
-// ФУНКЦИЯ ДОБАВЛЕНИЯ
-function addToCart(itemId) {
-    // 1. Проверяем, есть ли уже такой товар в корзине
+// Глобальные функции (нужны для onclick в карточках)
+window.addToCart = function(itemId) {
     const existingItem = cart.find(item => item.id === itemId);
 
     if (existingItem) {
-        // Если есть — просто увеличиваем количество
         existingItem.count += 1;
     } else {
-        // Если нет — находим его в меню и добавляем в корзину с полем count: 1
         const product = menuItems.find(item => item.id === itemId);
-        // Создаем копию объекта и добавляем count
         cart.push({ ...product, count: 1 });
     }
 
     updateCartUI();
     showToast("Товар добавлен в корзину");
-}
+};
 
-// ФУНКЦИЯ УДАЛЕНИЯ (или уменьшения количества)
-function removeFromCart(itemId) {
+window.removeFromCart = function(itemId) {
     const itemIndex = cart.findIndex(item => item.id === itemId);
 
     if (itemIndex !== -1) {
@@ -138,20 +141,16 @@ function removeFromCart(itemId) {
     }
 
     updateCartUI();
-}
+};
 
-// ОБНОВЛЕНИЕ ИНТЕРФЕЙСА КОРЗИНЫ
 function updateCartUI() {
+    // Считаем количество и сумму
     let totalCount = 0;
-    for (let item of cart) {
-        totalCount += item.count;
-    }
-    cartCount.innerText = totalCount;
-
     let totalPrice = 0;
     let itemsHtml = "";
 
     for (let item of cart) {
+        totalCount += item.count;
         totalPrice += item.price * item.count;
         itemsHtml += `
             <div class="cart-item">
@@ -164,40 +163,18 @@ function updateCartUI() {
                     <span>${item.count}</span>
                     <button class="cart-btn" onclick="addToCart(${item.id})">+</button>
                 </div>
-            </div>
-        `;
+            </div>`;
     }
 
-    cartItemsList.innerHTML = cart.length === 0 ? "<p>Корзина пуста</p>" : itemsHtml;
-    cartTotal.innerText = totalPrice + " ₽";
+    // Выводим на экран
+    elements.cartCount.innerText = totalCount;
+    elements.cartTotal.innerText = totalPrice + " ₽";
+    elements.cartItemsList.innerHTML = cart.length === 0 ? "<p>Корзина пуста</p>" : itemsHtml;
 }
 
 /* 
    =========================================
-   УПРАВЛЕНИЕ ОКНОМ КОРЗИНЫ
-   =========================================
-*/
-document.getElementById('cart-toggle').onclick = () => cartModal.style.display = 'block';
-document.getElementById('close-cart').onclick = () => cartModal.style.display = 'none';
-
-window.onclick = (event) => {
-    if (event.target == cartModal) cartModal.style.display = 'none';
-};
-
-document.getElementById('checkout-btn').onclick = () => {
-    if (cart.length === 0) {
-        alert("Сначала добавьте хотя бы одно блюдо в корзину!");
-    } else {
-        alert("Заказ принят! Спасибо, что выбрали нас.");
-        cart = [];
-        updateCartUI();
-        cartModal.style.display = 'none';
-    }
-};
-
-/* 
-   =========================================
-   УВЕДОМЛЕНИЯ (Toast)
+   5. ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ (Уведомления)
    =========================================
 */
 function showToast(message) {
@@ -218,18 +195,42 @@ function showToast(message) {
 
 /* 
    =========================================
-   ФИЛЬТРЫ И СТАРТ
+   6. ИНИЦИАЛИЗАЦИЯ И СОБЫТИЯ
    =========================================
 */
-filterButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        filterButtons.forEach(btn => btn.classList.remove('active'));
-        button.classList.add('active');
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Отрисовываем всё меню
+    renderMenu(menuItems);
 
-        const category = button.dataset.category;
-        const filtered = menuItems.filter(item => category === "all" || item.category === category);
-        renderMenu(filtered);
+    // 2. Слушатели для фильтров
+    elements.filterButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            elements.filterButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+
+            const category = button.dataset.category;
+            const filtered = menuItems.filter(item => category === "all" || item.category === category);
+            renderMenu(filtered);
+        });
     });
-});
 
-window.onload = () => renderMenu(menuItems);
+    // 3. Управление модальным окном
+    elements.cartToggle.onclick = () => elements.cartModal.style.display = 'block';
+    elements.closeCart.onclick = () => elements.cartModal.style.display = 'none';
+
+    window.onclick = (event) => {
+        if (event.target == elements.cartModal) elements.cartModal.style.display = 'none';
+    };
+
+    // 4. Оформление заказа
+    elements.checkoutBtn.onclick = () => {
+        if (cart.length === 0) {
+            alert("Сначала добавьте хотя бы одно блюдо в корзину!");
+        } else {
+            alert("Заказ принят! Спасибо, что выбрали нас.");
+            cart = [];
+            updateCartUI();
+            elements.cartModal.style.display = 'none';
+        }
+    };
+});
